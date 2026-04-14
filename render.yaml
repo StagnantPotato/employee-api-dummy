@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: employee-api
+    runtime: node
+    buildCommand: npm install -g bun && bun install
+    startCommand: bun run start
+    envVars:
+      - key: PORT
+        value: 10000

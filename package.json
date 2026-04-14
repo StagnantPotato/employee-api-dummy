@@ -1,0 +1,12 @@
+{
+  "name": "employee-api",
+  "version": "1.0.0",
+  "description": "Dummy employee data API",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
