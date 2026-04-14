@@ -175,6 +175,7 @@ export function generateEmployees(): EmployeeProfile[] {
       basic_monthly_salary: salary,
       division_id: division.division_id,
       division_name: division.division_name,
+      division_code: division.division_code,
       employment_status: empStatus,
       official_station: seededFrom(stations),
       date_original_appointment: appointmentDate,

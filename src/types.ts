@@ -17,6 +17,7 @@ export interface EmployeeProfile {
   basic_monthly_salary: number;
   division_id: number;
   division_name: string;
+  division_code: string;
   employment_status: string;
   official_station: string | null;
   date_original_appointment: string | null;
