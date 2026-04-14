@@ -34,7 +34,24 @@ const server = Bun.serve({
     }
 
     if (path === "/attendance") {
-      return json(attendance);
+      const url = new URL(req.url);
+      const employeeId = url.searchParams.get("employee_id");
+      const cutoffStart = url.searchParams.get("cutoff_start");
+      const cutoffEnd = url.searchParams.get("cutoff_end");
+
+      let filtered = attendance;
+
+      if (employeeId) {
+        filtered = filtered.filter((r) => r.employee_id === employeeId);
+      }
+      if (cutoffStart) {
+        filtered = filtered.filter((r) => r.cutoff_start >= cutoffStart);
+      }
+      if (cutoffEnd) {
+        filtered = filtered.filter((r) => r.cutoff_end <= cutoffEnd);
+      }
+
+      return json(filtered);
     }
 
     if (path === "/divisions") {
