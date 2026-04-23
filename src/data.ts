@@ -144,6 +144,21 @@ function seededFrom<T>(arr: T[]): T {
   return arr[Math.floor(seededRand() * arr.length)];
 }
 
+function generateMonths(): string[] {
+  const months: string[] = [];
+  const now = new Date();
+  
+  // Generate 12 months back and 3 months forward from today
+  for (let i = -12; i <= 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    months.push(`${year}-${month}`);
+  }
+  
+  return months;
+}
+
 export function generateEmployees(): EmployeeProfile[] {
   seed = 42; // reset seed for consistency
   const profiles: EmployeeProfile[] = [];
@@ -194,7 +209,7 @@ export function generateEmployees(): EmployeeProfile[] {
 export function generateAttendance(): AttendanceRecord[] {
   seed = 99;
   const records: AttendanceRecord[] = [];
-  const months = ["2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03"];
+  const months = generateMonths();
 
   for (let empId = 1; empId <= 82; empId++) {
     for (const month of months) {
