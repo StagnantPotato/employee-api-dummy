@@ -90,8 +90,6 @@ const stations = [
   "Samal Island", "Nabunturan", "Baganga", "Bansalan", "Sta. Cruz",
 ];
 
-const employmentStatuses = ["Permanent", "Casual", "Contractual", "Job Order"];
-
 function pad(n: number, len: number) {
   return String(n).padStart(len, "0");
 }
@@ -144,21 +142,6 @@ function seededFrom<T>(arr: T[]): T {
   return arr[Math.floor(seededRand() * arr.length)];
 }
 
-function generateMonths(): string[] {
-  const months: string[] = [];
-  const now = new Date();
-  
-  // Generate 12 months back and 3 months forward from today
-  for (let i = -12; i <= 3; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    months.push(`${year}-${month}`);
-  }
-  
-  return months;
-}
-
 export function generateEmployees(): EmployeeProfile[] {
   seed = 42; // reset seed for consistency
   const profiles: EmployeeProfile[] = [];
@@ -209,46 +192,42 @@ export function generateEmployees(): EmployeeProfile[] {
 export function generateAttendance(): AttendanceRecord[] {
   seed = 99;
   const records: AttendanceRecord[] = [];
-  const months = generateMonths();
+
+  // Dynamically generate 12 months back and 3 months forward from today.
+  // Re-deploying is never needed just to update the date range.
+  const now = new Date();
+  const months: { year: number; month: number }[] = [];
+
+  for (let i = -12; i <= 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() + 1 });
+  }
 
   for (let empId = 1; empId <= 82; empId++) {
-    for (const month of months) {
-      const [year, monthNum] = month.split("-");
-      const firstCutoffStart = `${year}-${monthNum}-01`;
-      const firstCutoffEnd = `${year}-${monthNum}-15`;
-      const secondCutoffStart = `${year}-${monthNum}-16`;
-      const secondCutoffEnd = `${year}-${monthNum}-${new Date(parseInt(year), parseInt(monthNum), 0).getDate()}`;
+    for (const { year, month } of months) {
+      const mm      = String(month).padStart(2, "0");
+      const lastDay = new Date(year, month, 0).getDate(); // last day of month
 
-      // First cutoff
-      const daysPresent1 = seededInt(8, 11);
-      const late1 = seededInt(0, 3) > 0 ? seededInt(5, 90) : 0;
-      const undertime1 = seededInt(0, 4) > 0 ? seededInt(0, 60) : 0;
-      const lwop1 = seededInt(0, 10) > 8 ? seededInt(1, 2) : 0;
-
+      // First cutoff: 1–15
       records.push({
-        employee_id: `EMP${pad(empId, 3)}`,
-        cutoff_start: firstCutoffStart,
-        cutoff_end: firstCutoffEnd,
-        days_present: daysPresent1,
-        lwop_days: lwop1,
-        late_minutes: late1,
-        undertime_minutes: undertime1,
+        employee_id:       `EMP${pad(empId, 3)}`,
+        cutoff_start:      `${year}-${mm}-01`,
+        cutoff_end:        `${year}-${mm}-15`,
+        days_present:      seededInt(8, 11),
+        lwop_days:         seededInt(0, 10) > 8 ? seededInt(1, 2) : 0,
+        late_minutes:      seededInt(0, 3) > 0 ? seededInt(5, 90) : 0,
+        undertime_minutes: seededInt(0, 4) > 0 ? seededInt(0, 60) : 0,
       });
 
-      // Second cutoff
-      const daysPresent2 = seededInt(8, 11);
-      const late2 = seededInt(0, 3) > 0 ? seededInt(5, 90) : 0;
-      const undertime2 = seededInt(0, 4) > 0 ? seededInt(0, 60) : 0;
-      const lwop2 = seededInt(0, 10) > 8 ? seededInt(1, 2) : 0;
-
+      // Second cutoff: 16–end of month
       records.push({
-        employee_id: `EMP${pad(empId, 3)}`,
-        cutoff_start: secondCutoffStart,
-        cutoff_end: secondCutoffEnd,
-        days_present: daysPresent2,
-        lwop_days: lwop2,
-        late_minutes: late2,
-        undertime_minutes: undertime2,
+        employee_id:       `EMP${pad(empId, 3)}`,
+        cutoff_start:      `${year}-${mm}-16`,
+        cutoff_end:        `${year}-${mm}-${lastDay}`,
+        days_present:      seededInt(8, 11),
+        lwop_days:         seededInt(0, 10) > 8 ? seededInt(1, 2) : 0,
+        late_minutes:      seededInt(0, 3) > 0 ? seededInt(5, 90) : 0,
+        undertime_minutes: seededInt(0, 4) > 0 ? seededInt(0, 60) : 0,
       });
     }
   }
